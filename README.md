@@ -3,22 +3,36 @@
 ## Welcome to my repository of turn-based strategy game made in Python!
 
 ### Introduction:
--here is a space for short intro
+This project is my first real and ready to show programming work.
+
+In case of any questions you can find everything about contact with me on my website - www.skublin.me
 
 ---
 
 ### Description:
--space for description of tools, ideas, etc.
+For now I'll list here all tools (without description) that I use in this project:
+
+-Ubuntu 21.04
+-Python 3.9
+-PyCharm Community Edition 2021.1.1
+-drawio (UML diagram)
+-Pygame library
+-Git and GitHub
+-Todoist
+-graphic assets from https://craftpix.net/
+-GIMP
 
 ---
 
 ### Installation:
-some instructions
+At actual stage of this project you can just clone this repository and run main.py file.
 
 ---
 
-### Change log:
-0.1
-0.2
+### Changelog:
+I'll add here new informations about major changes and new versions:
+
+-version 0.1.1 (15.05): first working update, only Menu with graphic and basic user interface
+-version 0.1.2 (upcoming): update of Menu with game and character creation
 
 ---
