@@ -1,4 +1,4 @@
-# PyHero
+# The PyHero
 
 ## Welcome to my repository of turn-based strategy game made in Python!
 
