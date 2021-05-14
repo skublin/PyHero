@@ -22,6 +22,9 @@ class Game:
         self.curr_menu = self.main_menu
 
     def game_loop(self):
+        """
+        A basic function to start the game.
+        """
         while self.playing:
             self.check_events()
             if self.START_KEY:
