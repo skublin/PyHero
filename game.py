@@ -17,6 +17,7 @@ class Game:
         self.font_name = 'graphics/FrederickaTheGreat.ttf'
         self.BLACK, self.WHITE = (0, 0, 0), (255, 255, 255)
         self.main_menu = MainMenu(self)
+        self.game_menu = GameMenu(self)
         self.options = OptionsMenu(self)
         self.credits = CreditsMenu(self)
         self.curr_menu = self.main_menu
@@ -30,7 +31,6 @@ class Game:
             if self.START_KEY:
                 self.playing = False
             self.display.blit(self.world_map, (0, 0))
-            self.draw_text('Lets play!', 20, self.DISPLAY_W / 2, self.DISPLAY_H / 2)
             self.window.blit(self.display, (0, 0))
             pygame.display.update()
             self.reset_keys()
