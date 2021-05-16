@@ -25,7 +25,12 @@ For now I'll list here all tools (without description) that I use in this projec
 ---
 
 ### Installation:
-At actual stage of this project you can just clone this repository and run main.py file.
+First, you have to clone or download this repository and store it in one place.
+Then, just few steps:
+
+* install Python on your device (you can find official release [here](https://www.python.org/downloads/))
+* install Pygame library (read about installation process [here](https://www.pygame.org/wiki/GettingStarted))
+* open catalog with game files in your terminal or command line and type **python main.py**
 
 ---
 
