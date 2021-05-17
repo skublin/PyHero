@@ -37,7 +37,7 @@ Then, just few steps:
 ### Changelog:
 I'll add here new informations about major changes and new versions:
 
-* version **0.1.1** (15.05): first working update, only Menu with graphic and basic user interface
-* version **0.1.2** (upcoming): update of Menu with game and character creation
+* eggPy.zero **v0.1.0** (15.05): first working release, only Menu with graphic and basic user interface
+* eggPy.one **v0.1.1** (upcoming): update of Menu with game and character creation
 
 ---
