@@ -1,5 +1,5 @@
-import pygame
 from menu import *
+import pygame
 
 
 class Game:
@@ -8,6 +8,9 @@ class Game:
     """
     def __init__(self):
         pygame.init()
+        pygame.display.set_caption("The PyHero")
+        pygame.mixer.music.load("music/song.ogg")
+        pygame.mixer.music.play(-1)
         self.running, self.playing = True, False
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
         self.DISPLAY_W, self.DISPLAY_H = 1024, 768
