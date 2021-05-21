@@ -25,14 +25,22 @@ For now I'll list here all tools (without description) that I use in this projec
 ---
 
 ### Installation:
-At actual stage of this project you can just clone this repository and run main.py file.
+First, you have to clone or download this repository and store it in one place.
+Then, just few steps:
+
+* install Python on your device (you can find official release [here](https://www.python.org/downloads/))
+* install Pygame library (read about installation process [here](https://www.pygame.org/wiki/GettingStarted))
+* open catalog with game files in your terminal or command line and type **python main.py**
 
 ---
 
 ### Changelog:
 I'll add here new informations about major changes and new versions:
 
-* version **0.1.1** (15.05): first working update, only Menu with graphic and basic user interface
-* version **0.1.2** (upcoming): update of Menu with game and character creation
+* eggPy.zero **v0.1.0** (15.05): first working release, only Menu with graphic and basic user interface
+* eggPy.one **v0.1.1** (upcoming): update of Menu with game and character creation
+* eggPy.two **v0.1.2**
+* eggPy.three **v0.1.3**
+* eggPy.four **v0.1.4**
 
 ---
