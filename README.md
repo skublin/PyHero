@@ -38,8 +38,8 @@ Then, just few steps:
 I'll add here new informations about major changes and new versions:
 
 * eggPy.zero **v0.1.0** (15.05): first working release, only Menu with graphic and basic user interface
-* eggPy.one **v0.1.1** (upcoming): update of Menu with game and character creation
-* eggPy.two **v0.1.2**
+* eggPy.one **v0.1.1** (28.05): update of Menu with game and character creation
+* eggPy.two **v0.1.2** (upcoming): major action of Warriors and Characters on World Map with pause Menu
 * eggPy.three **v0.1.3**
 * eggPy.four **v0.1.4**
 
