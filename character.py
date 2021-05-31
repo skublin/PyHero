@@ -1,4 +1,10 @@
 import pygame
+from warrior import *
+
+
+# list of possible warriors in every fraction
+# it's a dictionary '[fraction name]': list(Warriors from class Warrior)
+ARMIES = {'Demon': [Warrior('0', 30, 10, 8, 5)], 'Elf': [], 'Human': [], 'Undead': []}
 
 
 class Character:
@@ -10,8 +16,9 @@ class Character:
         self.fraction = fraction
         self.level = 1
         self.experience = 0
-        self.army = []
+        # self.army = [(warrior, 0) for warrior in ARMIES[self.fraction]]
         self.position = position
+        self.moves = 10
 
     def add_warrior(self):
         pass

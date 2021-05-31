@@ -9,7 +9,7 @@ class Warrior:
         self.attack = attack
         self.defence = defence
         self.cost = cost
-        self.image = IMAGES[self.name]
+        # self.image = IMAGES[self.name]
 
     def attack(self):
         pass

@@ -12,10 +12,11 @@ class Menu:
         self.run_display = True
         self.bg = pygame.image.load('graphics/menu.png')
         self.cursor_rect = pygame.Rect(0, 0, 20, 20)
-        self.offset = -116
+        self.offset = -96
+        pygame.mouse.set_visible(False)
 
     def draw_cursor(self):
-        self.game.draw_text('->', 68, self.cursor_rect.x, self.cursor_rect.y)
+        self.game.draw_text('->', 68, self.cursor_rect.x, self.cursor_rect.y, text_format='c')
 
     def blit_screen(self):
         self.game.window.blit(self.game.display, (0, 0))
@@ -38,11 +39,11 @@ class MainMenu(Menu):
             self.game.check_events()
             self.check_input()
             self.game.display.blit(self.bg, (0, 0))
-            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 38)
-            self.game.draw_text("Start Game", 44, self.mid_width, self.mid_height + 64)
-            self.game.draw_text("Options", 44, self.mid_width, self.mid_height + 112)
-            self.game.draw_text("Credits", 44, self.mid_width, self.mid_height + 160)
-            self.game.draw_text("Quit Game", 44, self.mid_width, self.mid_height + 208)
+            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 36, text_format='c')
+            self.game.draw_text("Start Game", 44, self.mid_width - 48, self.mid_height + 38, text_format='tl')
+            self.game.draw_text("Options", 44, self.mid_width - 48, self.mid_height + 86, text_format='tl')
+            self.game.draw_text("Credits", 44, self.mid_width - 48, self.mid_height + 134, text_format='tl')
+            self.game.draw_text("Quit Game", 44, self.mid_width - 48, self.mid_height + 182, text_format='tl')
             self.draw_cursor()
             self.blit_screen()
 
@@ -103,10 +104,10 @@ class GameMenu(Menu):
             self.game.check_events()
             self.check_input()
             self.game.display.blit(self.bg, (0, 0))
-            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 38)
-            self.game.draw_text("New Game", 44, self.mid_width, self.mid_height + 64)
-            self.game.draw_text("Load Game", 44, self.mid_width, self.mid_height + 112)
-            self.game.draw_text("Back", 44, self.mid_width, self.mid_height + 160)
+            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 36, text_format='c')
+            self.game.draw_text("New Game", 44, self.mid_width - 48, self.mid_height + 38, text_format='tl')
+            self.game.draw_text("Load Game", 44, self.mid_width - 48, self.mid_height + 86, text_format='tl')
+            self.game.draw_text("Back", 44, self.mid_width - 48, self.mid_height + 134, text_format='tl')
             self.draw_cursor()
             self.blit_screen()
 
@@ -169,13 +170,13 @@ class CreatorMenu(Menu):
             self.game.check_events()
             self.check_input()
             self.game.display.blit(self.bg, (0, 0))
-            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 38)
+            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 36, text_format='c')
             self.game.draw_text(self.input_name if self.input_name else "Pick Name",
-                                44, self.mid_width, self.mid_height + 64)
-            self.game.draw_text("Flag Color", 44, self.mid_width, self.mid_height + 112)
-            self.game.draw_text("Fraction", 44, self.mid_width, self.mid_height + 160)
-            self.game.draw_text("Let's go!", 44, self.mid_width, self.mid_height + 208)
-            self.game.draw_text("Back", 44, self.mid_width, self.mid_height + 256)
+                                44, self.mid_width - 48, self.mid_height + 38, text_format='tl')
+            self.game.draw_text("Flag Color", 44, self.mid_width - 48, self.mid_height + 86, text_format='tl')
+            self.game.draw_text("Fraction", 44, self.mid_width - 48, self.mid_height + 134, text_format='tl')
+            self.game.draw_text("Let's go!", 44, self.mid_width - 48, self.mid_height + 182, text_format='tl')
+            self.game.draw_text("Back", 44, self.mid_width - 48, self.mid_height + 230, text_format='tl')
             self.draw_cursor()
             self.blit_screen()
 
@@ -229,6 +230,7 @@ class CreatorMenu(Menu):
             elif self.state == 'Go':
                 self.run_display = False
                 self.game.playing = True
+                pygame.mouse.set_visible(True)
                 self.game.display = pygame.Surface((self.game.DISPLAY_W, self.game.DISPLAY_H + 114))
                 self.game.window = pygame.display.set_mode((self.game.DISPLAY_W, self.game.DISPLAY_H + 114))
             elif self.state == 'Back':
@@ -370,10 +372,10 @@ class OptionsMenu(Menu):
             self.game.check_events()
             self.check_input()
             self.game.display.blit(self.bg, (0, 0))
-            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 38)
-            self.game.draw_text("Volume", 44, self.mid_width, self.mid_height + 64)
-            self.game.draw_text("Controls", 44, self.mid_width, self.mid_height + 112)
-            self.game.draw_text("Back", 44, self.mid_width, self.mid_height + 160)
+            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 36, text_format='c')
+            self.game.draw_text("Volume", 44, self.mid_width - 48, self.mid_height + 38, text_format='tl')
+            self.game.draw_text("Controls", 44, self.mid_width - 48, self.mid_height + 86, text_format='tl')
+            self.game.draw_text("Back", 44, self.mid_width - 48, self.mid_height + 134, text_format='tl')
             self.draw_cursor()
             self.blit_screen()
 
@@ -441,11 +443,12 @@ class CreditsMenu(Menu):
                 self.game.curr_menu = self.game.main_menu
                 self.run_display = False
             self.game.display.blit(self.bg, (0, 0))
-            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 38)
-            self.game.draw_text('Author:', 44, 510, self.mid_height + 64)
-            self.game.draw_text('Szymon Kublin', 44, 510, self.mid_height + 112)
-            self.game.draw_text('Music:', 44, 510, self.mid_height + 170)
-            self.game.draw_text('Pictures of the Floating World', 44, 510, self.mid_height + 218)
-            self.game.draw_text('Graphic:', 44, 510, self.mid_height + 276)
-            self.game.draw_text('CraftPix Assets', 44, 510, self.mid_height + 324)
+            self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 36, text_format='c')
+            self.game.draw_text('Author:', 44, self.mid_width, self.mid_height + 64, text_format='c')
+            self.game.draw_text('Szymon Kublin', 44, self.mid_width, self.mid_height + 112, text_format='c')
+            self.game.draw_text('Music:', 44, self.mid_width, self.mid_height + 170, text_format='c')
+            self.game.draw_text('Pictures of the Floating World', 44,
+                                self.mid_width, self.mid_height + 218, text_format='c')
+            self.game.draw_text('Graphic:', 44, self.mid_width, self.mid_height + 276, text_format='c')
+            self.game.draw_text('CraftPix Assets', 44, self.mid_width, self.mid_height + 324, text_format='c')
             self.blit_screen()
