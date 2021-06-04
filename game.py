@@ -67,7 +67,7 @@ class Game:
             self.check_events()
             if self.move:
                 road = self.player.move((self.mx, self.my))
-                if self.answer == 'yes':
+                if self.answer == 'yes' and not self.new_turn:
                     for r in road:
                         self.player.position = self.POSITIONS[r[0]][r[1]]
                         self.draw_interface()
