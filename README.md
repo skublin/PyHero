@@ -22,6 +22,8 @@ For now I'll list here all tools (without description) that I use in this projec
 * graphic assets from [CraftPix](https://craftpix.net/)
 * music from Free Music Archive
 * GIMP
+* for text-input I use code from here [Nearoo](https://github.com/Nearoo/pygame-text-input)
+* files in *structures* are not mine, it's code from Python lectures (written by Grzegorz Jagiella)
 
 ---
 
