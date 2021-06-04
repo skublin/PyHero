@@ -20,6 +20,7 @@ For now I'll list here all tools (without description) that I use in this projec
 * Git and GitHub
 * Todoist
 * graphic assets from [CraftPix](https://craftpix.net/)
+* music from Free Music Archive
 * GIMP
 
 ---
@@ -30,6 +31,7 @@ Then, just few steps:
 
 * install Python on your device (you can find official release [here](https://www.python.org/downloads/))
 * install Pygame library (read about installation process [here](https://www.pygame.org/wiki/GettingStarted))
+* install other libraries from requirements.txt
 * open catalog with game files in your terminal or command line and type **python main.py**
 
 ---
