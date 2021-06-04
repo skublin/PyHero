@@ -31,7 +31,7 @@ Then, just few steps:
 
 * install Python on your device (you can find official release [here](https://www.python.org/downloads/))
 * install Pygame library (read about installation process [here](https://www.pygame.org/wiki/GettingStarted))
-* install other libraries from requirements.txt
+* install other libraries from *requirements.txt*
 * open catalog with game files in your terminal or command line and type **python main.py**
 
 ---
