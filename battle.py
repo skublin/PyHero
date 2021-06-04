@@ -5,3 +5,6 @@ class Battle:
         self.number = number
         self.player = player
         self.enemy = enemy
+
+    def check_armies(self):
+        player = self.player.army

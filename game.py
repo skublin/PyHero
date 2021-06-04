@@ -1,23 +1,24 @@
 from menu import *
 from character import *
-from battle import *
-from random import choice
+from battle import Battle
+from world import World
+from structures.dijkstra import Dijkstra
+from random import choice, randint
 import pygame
-
-
-# available positions (201) on world map (Tuple with x and y)
-# it's a kind a matrix with every tile's center point
-MAP_POSITIONS = [[[76 + 64 * j if i % 2 == 0 else 44 + 64 * j, 174 + 55 * i] for j in range(15 if i % 2 == 0 else 16)]
-                 for i in range(13)]
 
 FRACTIONS = {0: 'Demon', 1: 'Elf', 2: 'Human', 3: 'Undead'}
 
 IMAGES = {'window_prompt': pygame.image.load('graphics/prompt_window.png'),
-          'turn_button': pygame.image.load('graphics/turn_button.png'),
-          'yes_button': pygame.image.load('graphics/yes_button.png'),
-          'no_button': pygame.image.load('graphics/no_button.png'),
+          'char_button': pygame.image.load('graphics/btn/char_button.png'),
+          'army_button': pygame.image.load('graphics/btn/army_button.png'),
+          'info_button': pygame.image.load('graphics/btn/info_button.png'),
+          'settings_button': pygame.image.load('graphics/btn/settings_button.png'),
+          'turn_button': pygame.image.load('graphics/btn/turn_button.png'),
+          'yes_button': pygame.image.load('graphics/btn/yes_button.png'),
+          'no_button': pygame.image.load('graphics/btn/no_button.png'),
           'interface': pygame.image.load('graphics/interface.png'),
-          'map': pygame.image.load('graphics/map.png')}
+          'map': pygame.image.load('graphics/map.png'),
+          'arrow': pygame.image.load('graphics/move_arrow.png')}
 
 
 class Game:
@@ -29,10 +30,13 @@ class Game:
         pygame.display.set_caption("The PyHero")
         pygame.mixer.music.load("music/song.ogg")
         pygame.mixer.music.play(-1)
-
         self.running, self.playing = True, False
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.ESCAPE_KEY = False, False, False, False, False
         self.DISPLAY_W, self.DISPLAY_H = 1048, 792
+        self.POSITIONS = [[[76 + 64 * j if i % 2 == 0 else 108 + 64 * j, 174 + 55 * i] for j in range(15)]
+                          for i in range(13)]
+        self.world = World(self)
+        self.dij = Dijkstra(self.world.G)
         self.display = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
         self.window = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
         self.font_name = 'graphics/FrederickaTheGreat.ttf'
@@ -43,20 +47,17 @@ class Game:
         self.options = OptionsMenu(self)
         self.credits = CreditsMenu(self)
         self.curr_menu = self.main_menu
-
         self.player, self.enemy = self.make_characters()
         self.turn = 0
         self.new_turn = False
+        self.battle = False
         self.battle_number = 0
-        self.prompt = False
-        self.prompt_answer = False
+        self.prompt, self.prompt_answer = False, False
+        self.answer = ''
         self.mx, self.my = 0, 0     # mouse position, start at (0, 0)
-        self.clicking = False
+        self.move = False
         self.map = None
-        self.button_turn = None
-        self.button_yes = None
-        self.button_no = None
-        self.button_tile = None
+        self.buttons = dict()
 
     def game_loop(self):
         """
@@ -65,23 +66,22 @@ class Game:
         self.turn = 1
         self.player.flag = pygame.image.load(f'graphics/flags/{self.creator_menu.flag_number}_small.png')
         self.player.name = self.creator_menu.input_name
-        self.player.fraction = self.creator_menu.fraction_number
+        self.player.fraction = self.creator_menu.fractions[self.creator_menu.fraction_number]
         while self.playing:
             self.draw_interface()
             self.check_events()
-            if self.ESCAPE_KEY:
-                self.prompt = True
-                self.open_prompt('Are you sure?')
-                if self.prompt_answer:
-                    self.prompt_answer = False
-                    self.playing = False
-                    pygame.mouse.set_visible(False)
-                    self.display = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
-                    self.window = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
-            if self.clicking:
-                self.player.position = self.closest_position((self.mx, self.my))
+            if self.move:
+                road = self.player.move((self.mx, self.my))
+                for r in road:
+                    self.player.position = self.POSITIONS[r[0]][r[1]]
+                    self.draw_interface()
+                    self.window.blit(self.display, (0, 0))
+                    pygame.display.update()
+                    pygame.time.delay(500)
             while self.player.position == self.enemy.position:
+                self.battle = True
                 self.battle_number += 1
+                self.display.blit(IMAGES['map'], (12, 126))
                 self.start_battle()
             while self.prompt:
                 additional_text = ''
@@ -89,8 +89,30 @@ class Game:
                     additional_text = f'You still have {self.player.moves} moves!'
                 self.open_prompt('Are you sure?', additional_text)
                 if self.prompt_answer:
-                    self.turn += 1
-                    self.prompt_answer = False
+                    if self.answer == 'yes':
+                        self.new_turn = True
+                        self.prompt = False
+                    else:
+                        self.prompt = False
+            if self.new_turn:
+                road = self.enemy.make_move()
+                for r in road:
+                    self.enemy.position = self.POSITIONS[r[0]][r[1]]
+                    self.draw_interface()
+                    self.window.blit(self.display, (0, 0))
+                    pygame.display.update()
+                    pygame.time.delay(500)
+                self.turn += 1
+                self.player.moves += self.add_moves()
+                self.enemy.moves += self.add_moves()
+                self.new_turn = False
+            if self.ESCAPE_KEY:
+                self.playing = False
+                self.curr_menu = self.creator_menu
+                self.curr_menu.run_display = True
+                pygame.mouse.set_visible(False)
+                self.display = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
+                self.window = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
             self.window.blit(self.display, (0, 0))
             pygame.display.update()
             self.reset_keys()
@@ -121,20 +143,29 @@ class Game:
                 """
                 self.mx, self.my = pygame.mouse.get_pos()
                 if event.button == 1:
-                    # self.clicking = True
-                    if self.map.collidepoint(self.mx, self.my):
-                        self.clicking = True
-                    elif self.button_turn.collidepoint(self.mx, self.my):
+                    if self.map.collidepoint(self.mx, self.my) and not self.prompt:
+                        self.move = True
+                    elif self.buttons['char'].collidepoint(self.mx, self.my):
                         self.prompt = True
-                    elif self.button_yes.collidepoint(self.mx, self.my):
+                    elif self.buttons['army'].collidepoint(self.mx, self.my):
+                        self.prompt = True
+                    elif self.buttons['info'].collidepoint(self.mx, self.my):
+                        self.prompt = True
+                    elif self.buttons['settings'].collidepoint(self.mx, self.my):
+                        self.prompt = True
+                    elif self.buttons['turn'].collidepoint(self.mx, self.my):
+                        self.prompt = True
+                    elif self.buttons['yes'].collidepoint(self.mx, self.my):
+                        self.answer = 'yes'
                         self.prompt_answer = True
                         self.prompt = False
-                    elif self.button_no.collidepoint(self.mx, self.my):
-                        self.prompt_answer = False
+                    elif self.buttons['no'].collidepoint(self.mx, self.my):
+                        self.answer = 'no'
+                        self.prompt_answer = True
                         self.prompt = False
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
-                    self.clicking = False
+                    self.move = False
 
     def reset_keys(self):
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.ESCAPE_KEY = False, False, False, False, False
@@ -142,22 +173,26 @@ class Game:
     def draw_interface(self):
         self.map = self.display.blit(IMAGES['map'], (12, 126))
         self.display.blit(IMAGES['interface'], (0, 0))
-        self.draw_text(f'{self.player.name} ({FRACTIONS[self.player.fraction]}) ', 40, 24, 16, text_format='tl')
-        self.draw_text(f'| level: {self.player.level} | experience: {self.player.experience} |'
-                       f' money: {self.player.money}', 24, 28, 62, text_format='tl')
+        self.draw_text(f'{self.player.name}', 40, 26, 14, text_format='tl')
+        self.draw_text(f'| level: {self.player.level} ({self.player.experience}/100) |'
+                       f' money: {self.player.money} |', 26, 28, 64, text_format='tl')
         self.draw_text(f'Turn: {self.turn}', 36, 768, 16, text_format='tl')
         self.draw_text(f'Moves: {self.player.moves}', 36, 768, 54, text_format='tl')
-        self.button_turn = self.display.blit(IMAGES['turn_button'], (942, 20))
+        self.buttons['char'] = self.display.blit(IMAGES['char_button'], (394, 20))
+        self.buttons['army'] = self.display.blit(IMAGES['army_button'], (484, 20))
+        self.buttons['info'] = self.display.blit(IMAGES['info_button'], (574, 20))
+        self.buttons['settings'] = self.display.blit(IMAGES['settings_button'], (664, 20))
+        self.buttons['turn'] = self.display.blit(IMAGES['turn_button'], (942, 20))
         self.display_flag(self.player.flag, self.player.position)
         self.display_flag(self.enemy.flag, self.enemy.position)
 
     def make_characters(self):
-        player = Player(self, 'Name', 0, 0, (960, 830))
+        player = Player(self, 'Name', 0, 'Demon', choice(self.POSITIONS[12]))
         flags_left = [i for i in range(8)]
         flags_left.remove(self.creator_menu.flag_number)
-        fractions_left = [i for i in range(4)]
-        fractions_left.remove(self.creator_menu.fraction_number)
-        enemy = Enemy(self, 'Enemy', choice(flags_left), choice(fractions_left), choice(MAP_POSITIONS[0]))
+        fractions_left = ['Demon', 'Elf', 'Human', 'Undead']
+        fractions_left.remove(self.creator_menu.fractions[self.creator_menu.fraction_number])
+        enemy = Enemy(self, 'Enemy', choice(flags_left), choice(fractions_left), choice(self.POSITIONS[0]))
         return player, enemy
 
     def draw_text(self, text, size, x, y, text_format=None):
@@ -173,10 +208,16 @@ class Game:
     def open_prompt(self, text, additional_text=''):
         while self.prompt:
             self.check_events()
+            if self.ESCAPE_KEY:
+                self.prompt = False
+                self.prompt_answer = False
+            elif self.START_KEY:
+                self.prompt = False
+                self.prompt_answer = True
             self.draw_interface()
             self.display.blit(IMAGES['window_prompt'], (204, 256))
-            self.button_yes = self.display.blit(IMAGES['yes_button'], (616, 350))
-            self.button_no = self.display.blit(IMAGES['no_button'], (358, 350))
+            self.buttons['yes'] = self.display.blit(IMAGES['yes_button'], (616, 350))
+            self.buttons['no'] = self.display.blit(IMAGES['no_button'], (358, 350))
             self.draw_text(text, 32, 524, 278, text_format='c')
             if len(additional_text) > 0:
                 self.draw_text(additional_text, 32, 524, 314, text_format='c')
@@ -192,23 +233,15 @@ class Game:
         flag_rect.bottomleft = position
         self.display.blit(flag, flag_rect)
 
-    # it needs to be done better in some way (right algorithm or section of positions)
-    def closest_position(self, click_point):
-        """
-        Method to determine which point of possible positions is the nearest one to clicked point.
-        In other words it finds the center of a tile for given click point.
-        """
-        x, y = click_point
-        minimum = 40
-        closest_center = (0, 0)
-        for row in MAP_POSITIONS:
-            for position in row:
-                xp, yp = position
-                distance = ((xp - x)**2 + (yp - y)**2)**(1/2)
-                if distance < minimum:
-                    minimum = distance
-                    closest_center = (xp, yp)
-        return closest_center
+    def add_moves(self):
+        result = 0
+        for _ in range(4):
+            result += self.dice_roll()
+        return int(result / 4)
+
+    @staticmethod
+    def dice_roll():
+        return randint(1, 6)
 
     def start_battle(self):
         """

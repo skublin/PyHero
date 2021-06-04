@@ -158,10 +158,11 @@ class CreatorMenu(Menu):
     """
     def __init__(self, game):
         Menu.__init__(self, game)
-        self.state: str = 'Name'
-        self.input_name: str = ''
-        self.flag_number: int = 0
-        self.fraction_number: int = 0
+        self.state = 'Name'
+        self.input_name = ''
+        self.flag_number = 0
+        self.fraction_number = 0
+        self.fractions = ['Demon', 'Elf', 'Human', 'Undead']
         self.cursor_rect.midtop = (self.mid_width + self.offset, self.mid_height + 64)
 
     def display_menu(self):
@@ -223,11 +224,15 @@ class CreatorMenu(Menu):
         elif self.game.START_KEY:
             if self.state == 'Name':
                 self.input_name = self.text_input()
+                while len(self.input_name) > 12:
+                    self.input_name = self.text_input()
             elif self.state == 'Color':
                 self.flag_number = self.flag_picker()
             elif self.state == 'Fraction':
                 self.fraction_number = self.fraction_picker()
             elif self.state == 'Go':
+                while 1 > len(self.input_name) or len(self.input_name) > 12:
+                    self.input_name = self.text_input()
                 self.run_display = False
                 self.game.playing = True
                 pygame.mouse.set_visible(True)
@@ -267,7 +272,7 @@ class CreatorMenu(Menu):
                         return
             screen.blit(prompt_bg, (0, 0))
             text_input.update(events)
-            screen.blit(text_input.get_surface(), (134, 184))
+            screen.blit(text_input.get_surface(), (84, 184))
             pygame.display.update()
             clock.tick(30)
 
@@ -277,8 +282,8 @@ class CreatorMenu(Menu):
         It loads flags from /graphics/flags/ and scales it to proper resolution.
         """
         flags = [pygame.image.load(f'graphics/flags/{i}.png') for i in range(8)]
-        arrows = [pygame.transform.rotate(pygame.image.load('graphics/arrow_button.png'), 90),
-                  pygame.transform.rotate(pygame.image.load('graphics/arrow_button.png'), -90)]
+        arrows = [pygame.transform.rotate(pygame.image.load('graphics/btn/arrow_button.png'), 90),
+                  pygame.transform.rotate(pygame.image.load('graphics/btn/arrow_button.png'), -90)]
         prompt_bg = pygame.image.load('graphics/empty_prompt.png')
         screen = pygame.display.set_mode((512, 331))
         screen.blit(prompt_bg, (0, 0))
@@ -318,8 +323,8 @@ class CreatorMenu(Menu):
         It overrides third text in CreatorMenu ('Fraction') with chosen fraction name.
         """
         fraction_images = [pygame.image.load(f'graphics/fractions/{i}.png') for i in range(4)]
-        arrows = [pygame.transform.rotate(pygame.image.load('graphics/arrow_button.png'), 90),
-                  pygame.transform.rotate(pygame.image.load('graphics/arrow_button.png'), -90)]
+        arrows = [pygame.transform.rotate(pygame.image.load('graphics/btn/arrow_button.png'), 90),
+                  pygame.transform.rotate(pygame.image.load('graphics/btn/arrow_button.png'), -90)]
         prompt_bg = pygame.image.load('graphics/empty_prompt.png')
         screen = pygame.display.set_mode((512, 331))
         screen.blit(prompt_bg, (0, 0))

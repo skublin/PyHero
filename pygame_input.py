@@ -29,7 +29,7 @@ class TextInput:
         """
         :param initial_string: Initial text to be displayed
         :param font_size:  Size of font in pixels
-        :param anti_alias: Determines if antialias is applied to font (uses more processing power)
+        :param anti_alias: Determines if anti-alias is applied to font (uses more processing power)
         :param text_color: Color of text (duh)
         :param cursor_color: Color of cursor
         :param repeat_keys_initial_ms: Time in ms before keys are repeated when held
@@ -51,17 +51,17 @@ class TextInput:
         self.surface = pygame.Surface((1, 1))
         self.surface.set_alpha(0)
 
-        # Vars to make keydowns repeat after user pressed a key for some time:
-        self.keyrepeat_counters = {}  # {event.key: (counter_int, event.unicode)} (look for "***")
-        self.keyrepeat_intial_interval_ms = repeat_keys_initial_ms
-        self.keyrepeat_interval_ms = repeat_keys_interval_ms
+        # Vars to make key downs repeat after user pressed a key for some time:
+        self.key_repeat_counters = {}  # {event.key: (counter_int, event.unicode)} (look for "***")
+        self.key_repeat_initial_interval_ms = repeat_keys_initial_ms
+        self.key_repeat_interval_ms = repeat_keys_interval_ms
 
         # Things cursor:
         self.cursor_surface = pygame.Surface((int(self.font_size / 60 + 1), self.font_size))
         self.cursor_surface.fill(cursor_color)
         self.cursor_position = len(initial_string)  # Inside text
         self.cursor_visible = True  # Switches every self.cursor_switch_ms ms
-        self.cursor_switch_ms = 500  # /|\
+        self.cursor_switch_ms = 500
         self.cursor_ms_counter = 0
 
         self.clock = pygame.time.Clock()
@@ -72,9 +72,9 @@ class TextInput:
                 self.cursor_visible = True  # So the user sees where he writes
 
                 # If none exist, create counter for that key:
-                if event.key not in self.keyrepeat_counters:
+                if event.key not in self.key_repeat_counters:
                     if not event.key == pl.K_RETURN:    # Filters out return key, others can be added as necessary
-                        self.keyrepeat_counters[event.key] = [0, event.unicode]
+                        self.key_repeat_counters[event.key] = [0, event.unicode]
 
                 if event.key == pl.K_BACKSPACE:
                     self.input_string = (
@@ -117,22 +117,22 @@ class TextInput:
                     self.cursor_position += len(event.unicode)  # Some are empty, e.g. K_UP
 
             elif event.type == pl.KEYUP:
-                # *** Because KEYUP doesn't include event.unicode, this dict is stored in such a weird way
-                if event.key in self.keyrepeat_counters:
-                    del self.keyrepeat_counters[event.key]
+                # *** Because KEY UP doesn't include event.unicode, this dict is stored in such a weird way
+                if event.key in self.key_repeat_counters:
+                    del self.key_repeat_counters[event.key]
 
         # Update key counters:
-        for key in self.keyrepeat_counters:
-            self.keyrepeat_counters[key][0] += self.clock.get_time()  # Update clock
+        for key in self.key_repeat_counters:
+            self.key_repeat_counters[key][0] += self.clock.get_time()  # Update clock
 
             # Generate new key events if enough time has passed:
-            if self.keyrepeat_counters[key][0] >= self.keyrepeat_intial_interval_ms:
-                self.keyrepeat_counters[key][0] = (
-                    self.keyrepeat_intial_interval_ms
-                    - self.keyrepeat_interval_ms
+            if self.key_repeat_counters[key][0] >= self.key_repeat_initial_interval_ms:
+                self.key_repeat_counters[key][0] = (
+                    self.key_repeat_initial_interval_ms
+                    - self.key_repeat_interval_ms
                 )
 
-                event_key, event_unicode = key, self.keyrepeat_counters[key][1]
+                event_key, event_unicode = key, self.key_repeat_counters[key][1]
                 pygame.event.post(pygame.event.Event(pl.KEYDOWN, key=event_key, unicode=event_unicode))
 
         # Re-render text surface:
@@ -175,31 +175,3 @@ class TextInput:
     def clear_text(self):
         self.input_string = ""
         self.cursor_position = 0
-
-
-# maybe it's to be removed
-if __name__ == "__main__":
-    pygame.init()
-
-    # Create TextInput-object
-    textinput = TextInput()
-
-    screen = pygame.display.set_mode((512, 78))
-    clock = pygame.time.Clock()
-
-    while True:
-        screen.fill((225, 225, 225))
-
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT:
-                print(textinput.input_string)
-                exit()
-
-        # Feed it with events every frame
-        textinput.update(events)
-        # Blit its surface onto the screen
-        screen.blit(textinput.get_surface(), (10, 10))
-
-        pygame.display.update()
-        clock.tick(30)
