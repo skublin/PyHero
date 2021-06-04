@@ -43,7 +43,7 @@ I'll add here new informations about major changes and new versions:
 
 * eggPy.one **v0.1** (15.05): first working release, only Menu with graphic and basic user interface
 * eggPy.two **v0.2** (28.05): update of Menu with game and character creation
-* eggPy.three**v0.3** (04.06): small changes in Menu code, many changes in Game class (map as a graph, usage of Dijkstra algorithm, player and enemy movement on the map, basic next turn handling)
-* babyPy.four**v0.4** (upcoming): battleground, equipment, character card, basic economy, maybe some events on the map
+* eggPy.three **v0.3** (04.06): small changes in Menu code, many changes in Game class (map as a graph, usage of Dijkstra algorithm, player and enemy movement on the map, basic next turn handling)
+* babyPy.four **v0.4** (upcoming): battleground, equipment, character card, basic economy, maybe some events on the map
 
 ---
