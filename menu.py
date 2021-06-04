@@ -79,11 +79,11 @@ class MainMenu(Menu):
         self.move_cursor()
         if self.game.START_KEY:
             if self.state == 'Start':
-                self.game.curr_menu = self.game.game_menu
+                self.game.curr_menu = self.game.MENUS['game_menu']
             elif self.state == 'Options':
-                self.game.curr_menu = self.game.options
+                self.game.curr_menu = self.game.MENUS['options_menu']
             elif self.state == 'Credits':
-                self.game.curr_menu = self.game.credits
+                self.game.curr_menu = self.game.MENUS['credits_menu']
             elif self.state == 'Quit Game':
                 self.game.running = False
             self.run_display = False
@@ -136,17 +136,17 @@ class GameMenu(Menu):
     def check_input(self):
         self.move_cursor()
         if self.game.ESCAPE_KEY:
-            self.game.curr_menu = self.game.main_menu
+            self.game.curr_menu = self.game.MENUS['main_menu']
             self.run_display = False
             self.cursor_rect.midtop = (self.mid_width + self.offset, self.mid_height + 64)
         elif self.game.START_KEY:
             if self.state == 'New Game':
-                self.game.curr_menu = self.game.creator_menu
+                self.game.curr_menu = self.game.MENUS['creator_menu']
             elif self.state == 'Load Game':
                 # connection to database
                 pass
             elif self.state == 'Back':
-                self.game.curr_menu = self.game.main_menu
+                self.game.curr_menu = self.game.MENUS['main_menu']
                 self.cursor_rect.midtop = (self.mid_width + self.offset, self.mid_height + 64)
             self.run_display = False
 
@@ -218,7 +218,7 @@ class CreatorMenu(Menu):
     def check_input(self):
         self.move_cursor()
         if self.game.ESCAPE_KEY:
-            self.game.curr_menu = self.game.game_menu
+            self.game.curr_menu = self.game.MENUS['game_menu']
             self.run_display = False
             self.cursor_rect.midtop = (self.mid_width + self.offset, self.mid_height + 64)
         elif self.game.START_KEY:
@@ -239,7 +239,7 @@ class CreatorMenu(Menu):
                 self.game.display = pygame.Surface((self.game.DISPLAY_W, self.game.DISPLAY_H + 114))
                 self.game.window = pygame.display.set_mode((self.game.DISPLAY_W, self.game.DISPLAY_H + 114))
             elif self.state == 'Back':
-                self.game.curr_menu = self.game.game_menu
+                self.game.curr_menu = self.game.MENUS['game_menu']
                 self.cursor_rect.midtop = (self.mid_width + self.offset, self.mid_height + 64)
                 self.reset_creator()
             self.run_display = False
@@ -417,7 +417,7 @@ class OptionsMenu(Menu):
         self.move_cursor()
         # BACK_KEY may be removed
         if self.game.BACK_KEY or self.game.ESCAPE_KEY:
-            self.game.curr_menu = self.game.main_menu
+            self.game.curr_menu = self.game.MENUS['main_menu']
             self.cursor_rect.midtop = (self.mid_width + self.offset, self.mid_height + 64)
             self.run_display = False
         elif self.game.START_KEY:
@@ -428,7 +428,7 @@ class OptionsMenu(Menu):
                 # settings of controls
                 pass
             elif self.state == 'Back':
-                self.game.curr_menu = self.game.main_menu
+                self.game.curr_menu = self.game.MENUS['main_menu']
                 self.run_display = False
 
 
@@ -445,7 +445,7 @@ class CreditsMenu(Menu):
             self.game.check_events()
             # BACK_KEY may be removed
             if self.game.START_KEY or self.game.BACK_KEY or self.game.ESCAPE_KEY:
-                self.game.curr_menu = self.game.main_menu
+                self.game.curr_menu = self.game.MENUS['main_menu']
                 self.run_display = False
             self.game.display.blit(self.bg, (0, 0))
             self.game.draw_text("The PyHero", 66, self.mid_width, self.mid_height - 36, text_format='c')

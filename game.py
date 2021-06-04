@@ -41,20 +41,15 @@ class Game:
         self.window = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
         self.font_name = 'graphics/FrederickaTheGreat.ttf'
         # Menu initialization
-        self.main_menu = MainMenu(self)
-        self.game_menu = GameMenu(self)
-        self.creator_menu = CreatorMenu(self)
-        self.options = OptionsMenu(self)
-        self.credits = CreditsMenu(self)
-        self.curr_menu = self.main_menu
+        self.MENUS = {'main_menu': MainMenu(self), 'game_menu': GameMenu(self), 'creator_menu': CreatorMenu(self),
+                      'options_menu': OptionsMenu(self), 'credits_menu': CreditsMenu(self)}
+        self.curr_menu = self.MENUS['main_menu']
         self.player, self.enemy = self.make_characters()
-        self.turn = 0
-        self.new_turn = False
-        self.battle = False
-        self.battle_number = 0
+        self.turn, self.new_turn = 0, False
+        self.battle_number, self.battle = 0, False
         self.prompt, self.prompt_answer = False, False
         self.answer = ''
-        self.mx, self.my = 0, 0     # mouse position, start at (0, 0)
+        self.mx, self.my = 0, 0     # mouse position (mx, my)
         self.move = False
         self.map = None
         self.buttons = dict()
@@ -64,20 +59,21 @@ class Game:
         Method to start the game and handle all operations in game.
         """
         self.turn = 1
-        self.player.flag = pygame.image.load(f'graphics/flags/{self.creator_menu.flag_number}_small.png')
-        self.player.name = self.creator_menu.input_name
-        self.player.fraction = self.creator_menu.fractions[self.creator_menu.fraction_number]
+        self.player.flag = pygame.image.load(f"graphics/flags/{self.MENUS['creator_menu'].flag_number}_small.png")
+        self.player.name = self.MENUS['creator_menu'].input_name
+        self.player.fraction = self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number]
         while self.playing:
             self.draw_interface()
             self.check_events()
             if self.move:
                 road = self.player.move((self.mx, self.my))
-                for r in road:
-                    self.player.position = self.POSITIONS[r[0]][r[1]]
-                    self.draw_interface()
-                    self.window.blit(self.display, (0, 0))
-                    pygame.display.update()
-                    pygame.time.delay(500)
+                if self.answer == 'yes':
+                    for r in road:
+                        self.player.position = self.POSITIONS[r[0]][r[1]]
+                        self.draw_interface()
+                        self.window.blit(self.display, (0, 0))
+                        pygame.display.update()
+                        pygame.time.delay(500)
             while self.player.position == self.enemy.position:
                 self.battle = True
                 self.battle_number += 1
@@ -108,7 +104,7 @@ class Game:
                 self.new_turn = False
             if self.ESCAPE_KEY:
                 self.playing = False
-                self.curr_menu = self.creator_menu
+                self.curr_menu = self.MENUS['creator_menu']
                 self.curr_menu.run_display = True
                 pygame.mouse.set_visible(False)
                 self.display = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
@@ -189,9 +185,9 @@ class Game:
     def make_characters(self):
         player = Player(self, 'Name', 0, 'Demon', choice(self.POSITIONS[12]))
         flags_left = [i for i in range(8)]
-        flags_left.remove(self.creator_menu.flag_number)
+        flags_left.remove(self.MENUS['creator_menu'].flag_number)
         fractions_left = ['Demon', 'Elf', 'Human', 'Undead']
-        fractions_left.remove(self.creator_menu.fractions[self.creator_menu.fraction_number])
+        fractions_left.remove(self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number])
         enemy = Enemy(self, 'Enemy', choice(flags_left), choice(fractions_left), choice(self.POSITIONS[0]))
         return player, enemy
 
