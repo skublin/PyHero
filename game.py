@@ -17,8 +17,7 @@ IMAGES = {'window_prompt': pygame.image.load('graphics/prompt_window.png'),
           'yes_button': pygame.image.load('graphics/btn/yes_button.png'),
           'no_button': pygame.image.load('graphics/btn/no_button.png'),
           'interface': pygame.image.load('graphics/interface.png'),
-          'map': pygame.image.load('graphics/map.png'),
-          'arrow': pygame.image.load('graphics/move_arrow.png')}
+          'map': pygame.image.load('graphics/map.png')}
 
 
 class Game:
