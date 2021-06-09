@@ -1,3 +1,7 @@
+---
+title: "Szymon Kublin"
+---
+
 # Introduction:
 This project is my first real and ready to show programming work.
 
