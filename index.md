@@ -1,37 +1,43 @@
-## Welcome to GitHub Pages
+# Introduction:
+This project is my first real and ready to show programming work.
 
-You can use the [editor on GitHub](https://github.com/skublin/PyHero/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+In case of any questions you can find everything about contact with me on my [website](https://skublin.me).
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+---
 
-### Markdown
+# Description:
+For now I'll list here all tools (without description) that I use in this project:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+* Ubuntu 21.04
+* Python 3.9
+* PyCharm Community Edition 2021.1.1
+* drawio (UML diagram)
+* Pygame library
+* Git and GitHub
+* Todoist
+* graphic assets from [CraftPix](https://craftpix.net/)
+* music from Free Music Archive
+* GIMP
+* for text-input I use code from here [Nearoo](https://github.com/Nearoo/pygame-text-input)
+* files in *structures* are not mine, it's code from Python lectures (written by Grzegorz Jagiella)
 
-```markdown
-Syntax highlighted code block
+---
 
-# Header 1
-## Header 2
-### Header 3
+# Installation:
+First, you have to clone or download this repository and store it in one place.
+Then, just few steps:
 
-- Bulleted
-- List
+* install Python on your device (you can find official release [here](https://www.python.org/downloads/))
+* install Pygame library (read about installation process [here](https://www.pygame.org/wiki/GettingStarted))
+* install other libraries from *requirements.txt*
+* open catalog with game files in your terminal or command line and type **python main.py**
 
-1. Numbered
-2. List
+---
 
-**Bold** and _Italic_ and `Code` text
+### Changelog:
+I'll add here new informations about major changes and new versions:
 
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/skublin/PyHero/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+* eggPy.one **v0.1** (15.05): first working release, only Menu with graphic and basic user interface
+* eggPy.two **v0.2** (28.05): update of Menu with game and character creation
+* eggPy.three **v0.3** (04.06): small changes in Menu code, many changes in Game class (map as a graph, usage of Dijkstra algorithm, player and enemy movement on the map, basic next turn handling)
+* babyPy.four **v0.4** (upcoming): battleground, equipment, character card, basic economy, maybe some events on the map
