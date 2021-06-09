@@ -34,7 +34,7 @@ Then, just few steps:
 
 ---
 
-### Changelog:
+# Changelog:
 I'll add here new informations about major changes and new versions:
 
 * eggPy.one **v0.1** (15.05): first working release, only Menu with graphic and basic user interface
