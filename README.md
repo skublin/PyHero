@@ -47,3 +47,15 @@ I'll add here new informations about major changes and new versions:
 * babyPy.four **v0.4** (upcoming): battleground, equipment, character card, basic economy, maybe some events on the map
 
 ---
+
+### Credits:
+
+Music (Free Music Archive - [licence](https://creativecommons.org/licenses/by-nc/4.0/)): 
+
+* Menu: Pictures of the Floating World - Death's Head
+* Game:  Dee Yan-Key - Allegro animato 
+* Battle: Dee Yan-Key - Day of Snow 
+
+Sound:
+
+* Battle start: mixkit - medieval show fanfare announcement
