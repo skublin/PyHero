@@ -49,7 +49,7 @@ I'll add here new informations about major changes and new versions:
 
 ---
 
-### Credits:
+# Credits:
 
 Music (Free Music Archive - [licence](https://creativecommons.org/licenses/by-nc/4.0/)): 
 
