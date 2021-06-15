@@ -9,6 +9,7 @@ class World:
         self.size = len(self.game.POSITIONS[:]), len(self.game.POSITIONS[0][:])
         self.G = Graph()
         self.build_graph()
+        self.game_speed = 500
 
     # map size: n x m (rows x columns)
     def build_graph(self):
@@ -39,3 +40,9 @@ class World:
                 self.G.add_edge((v_i, v_j), (v_i + 1, v_j))
             if v_i - 1 >= 0:
                 self.G.add_edge((v_i, v_j), (v_i - 1, v_j))
+
+    def change_speed(self, up_down):
+        if up_down == 'up' and self.game_speed >= 200:
+            self.game_speed -= 100
+        elif up_down == 'down' and self.game_speed <= 1000:
+            self.game_speed += 100

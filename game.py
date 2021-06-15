@@ -1,4 +1,8 @@
-from menu import *
+from menus.main_menu import MainMenu
+from menus.game_menu import GameMenu
+from menus.creator_menu import CreatorMenu
+from menus.options_menu import OptionsMenu
+from menus.credits_menu import CreditsMenu
 from character import *
 from battle import Battle
 from world import World
@@ -9,6 +13,7 @@ import pygame
 FRACTIONS = {0: 'Demon', 1: 'Elf', 2: 'Human', 3: 'Undead'}
 
 IMAGES = {'window_prompt': pygame.image.load('graphics/prompt_window.png'),
+          'character_prompt': pygame.image.load('graphics/character_prompt.png'),
           'char_button': pygame.image.load('graphics/btn/char_button.png'),
           'army_button': pygame.image.load('graphics/btn/army_button.png'),
           'info_button': pygame.image.load('graphics/btn/info_button.png'),
@@ -17,7 +22,9 @@ IMAGES = {'window_prompt': pygame.image.load('graphics/prompt_window.png'),
           'yes_button': pygame.image.load('graphics/btn/yes_button.png'),
           'no_button': pygame.image.load('graphics/btn/no_button.png'),
           'interface': pygame.image.load('graphics/interface.png'),
-          'map': pygame.image.load('graphics/map.png')}
+          'map': pygame.image.load('graphics/map.png'),
+          'battleground': pygame.image.load('graphics/battleground_map.png'),
+          'battle_sign': pygame.image.load('graphics/battle_sign.png')}
 
 
 class Game:
@@ -27,8 +34,6 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("The PyHero")
-        pygame.mixer.music.load("music/song.ogg")
-        pygame.mixer.music.play(-1)
         self.running, self.playing = True, False
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.ESCAPE_KEY = False, False, False, False, False
         self.DISPLAY_W, self.DISPLAY_H = 1048, 792
@@ -43,14 +48,16 @@ class Game:
         self.MENUS = {'main_menu': MainMenu(self), 'game_menu': GameMenu(self), 'creator_menu': CreatorMenu(self),
                       'options_menu': OptionsMenu(self), 'credits_menu': CreditsMenu(self)}
         self.curr_menu = self.MENUS['main_menu']
-        self.player, self.enemy = self.make_characters()
+        self.player = Player(self, 'Name', 0, 'Human', choice(self.POSITIONS[12]))
+        self.enemy = Enemy(self, 'Enemy', 1, 'Undead', choice(self.POSITIONS[0]))
         self.turn, self.new_turn = 0, False
-        self.battle_number, self.battle = 0, False
+        self.battle, self.battle_number, self.battle_mode = None, 0, False
         self.prompt, self.prompt_answer = False, False
+        self.character_prompt, self.army_prompt = False, False
         self.answer = ''
         self.mx, self.my = 0, 0     # mouse position (mx, my)
         self.move = False
-        self.map = None
+        self.map, self.battle_map = None, None
         self.buttons = dict()
 
     def game_loop(self):
@@ -58,26 +65,23 @@ class Game:
         Method to start the game and handle all operations in game.
         """
         self.turn = 1
-        self.player.flag = pygame.image.load(f"graphics/flags/{self.MENUS['creator_menu'].flag_number}_small.png")
-        self.player.name = self.MENUS['creator_menu'].input_name
-        self.player.fraction = self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number]
+        self.make_characters()
         while self.playing:
+            # PREPARATION
             self.draw_interface()
             self.check_events()
+            # PLAYER MOVE
             if self.move:
                 road = self.player.move((self.mx, self.my))
                 if self.answer == 'yes' and not self.new_turn:
-                    for r in road:
-                        self.player.position = self.POSITIONS[r[0]][r[1]]
-                        self.draw_interface()
-                        self.window.blit(self.display, (0, 0))
-                        pygame.display.update()
-                        pygame.time.delay(500)
-            while self.player.position == self.enemy.position:
-                self.battle = True
+                    self.show_moves(road, True, False)
+            # BATTLE
+            if self.player.position == self.enemy.position:
+                self.show_battle_sign()
+                self.battle_mode = True
                 self.battle_number += 1
-                self.display.blit(IMAGES['map'], (12, 126))
                 self.start_battle()
+            # PROMPT WINDOW
             while self.prompt:
                 additional_text = ''
                 if self.player.moves > 0:
@@ -89,25 +93,43 @@ class Game:
                         self.prompt = False
                     else:
                         self.prompt = False
+            # PLAYER CARD PROMPT
+            while self.character_prompt:
+                self.player.character_info(IMAGES['character_prompt'])
+                if self.ESCAPE_KEY:
+                    self.ESCAPE_KEY = False
+                    self.character_prompt = False
+            # ARMY CARD PROMPT
+            while self.army_prompt:
+                pass
+            # NEXT TURN (ALSO ENEMY MOVE)
             if self.new_turn:
                 road = self.enemy.make_move()
-                for r in road:
-                    self.enemy.position = self.POSITIONS[r[0]][r[1]]
-                    self.draw_interface()
-                    self.window.blit(self.display, (0, 0))
-                    pygame.display.update()
-                    pygame.time.delay(500)
+                self.show_moves(road, False, True)
                 self.turn += 1
                 self.player.moves += self.add_moves()
                 self.enemy.moves += self.add_moves()
                 self.new_turn = False
+            # QUIT GAME
             if self.ESCAPE_KEY:
-                self.playing = False
-                self.curr_menu = self.MENUS['creator_menu']
-                self.curr_menu.run_display = True
-                pygame.mouse.set_visible(False)
-                self.display = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
-                self.window = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
+                self.prompt = True
+                self.ESCAPE_KEY = False
+                self.open_prompt('Are you sure?', "It'll close the game!")
+                if self.prompt_answer:
+                    if self.answer == 'yes':
+                        self.playing = False
+                        self.prompt = False
+                        self.curr_menu = self.MENUS['creator_menu']
+                        self.curr_menu.run_display = True
+                        pygame.mouse.set_visible(False)
+                        pygame.mixer.music.unload()
+                        pygame.mixer.music.load("music/menu_music.ogg")
+                        pygame.mixer.music.play(-1)
+                        self.display = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
+                        self.window = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
+                    if self.answer == 'no':
+                        self.prompt = False
+            # GAMEPLAY UPDATE
             self.window.blit(self.display, (0, 0))
             pygame.display.update()
             self.reset_keys()
@@ -141,9 +163,9 @@ class Game:
                     if self.map.collidepoint(self.mx, self.my) and not self.prompt:
                         self.move = True
                     elif self.buttons['char'].collidepoint(self.mx, self.my):
-                        self.prompt = True
+                        self.character_prompt = True
                     elif self.buttons['army'].collidepoint(self.mx, self.my):
-                        self.prompt = True
+                        self.army_prompt = True
                     elif self.buttons['info'].collidepoint(self.mx, self.my):
                         self.prompt = True
                     elif self.buttons['settings'].collidepoint(self.mx, self.my):
@@ -158,6 +180,11 @@ class Game:
                         self.answer = 'no'
                         self.prompt_answer = True
                         self.prompt = False
+                    # if statement to change player's character skills
+                    if self.character_prompt:
+                        for button in self.player.skill_buttons:
+                            if self.player.skill_buttons[button].collidepoint(self.mx, self.my):
+                                self.player.skill_change(button)
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     self.move = False
@@ -181,14 +208,38 @@ class Game:
         self.display_flag(self.player.flag, self.player.position)
         self.display_flag(self.enemy.flag, self.enemy.position)
 
+    def show_moves(self, road, player, enemy):
+        for r in road:
+            if player:
+                self.player.position = self.POSITIONS[r[0]][r[1]]
+            if enemy:
+                self.enemy.position = self.POSITIONS[r[0]][r[1]]
+            self.draw_interface()
+            self.window.blit(self.display, (0, 0))
+            pygame.display.update()
+            if not r == road[-1]:
+                pygame.time.delay(self.world.game_speed)
+
+    def show_battle_sign(self):
+        pygame.mixer.music.load("music/fanfare.wav")
+        pygame.mixer.music.play(1)
+        battle_sign_rect = IMAGES['battle_sign'].get_rect()
+        battle_sign_rect.center = self.player.position[0] + 12, self.player.position[1]
+        self.display.blit(IMAGES['battle_sign'], battle_sign_rect)
+        self.window.blit(self.display, (0, 0))
+        pygame.display.update()
+        pygame.time.delay(self.world.game_speed * 2)
+
     def make_characters(self):
-        player = Player(self, 'Name', 0, 'Demon', choice(self.POSITIONS[12]))
+        self.player.flag = pygame.image.load(f"graphics/flags/{self.MENUS['creator_menu'].flag_number}_small.png")
+        self.player.name = self.MENUS['creator_menu'].input_name
+        self.player.fraction = self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number]
         flags_left = [i for i in range(8)]
         flags_left.remove(self.MENUS['creator_menu'].flag_number)
         fractions_left = ['Demon', 'Elf', 'Human', 'Undead']
         fractions_left.remove(self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number])
-        enemy = Enemy(self, 'Enemy', choice(flags_left), choice(fractions_left), choice(self.POSITIONS[0]))
-        return player, enemy
+        self.enemy.flag = pygame.image.load(f"graphics/flags/{choice(flags_left)}_small.png")
+        self.enemy.fraction = choice(fractions_left)
 
     def draw_text(self, text, size, x, y, text_format=None):
         font = pygame.font.Font(self.font_name, size)
@@ -242,4 +293,6 @@ class Game:
         """
         This method is used to start a battle when player and enemy are on the same tile.
         """
-        Battle(self, self.battle_number, self.player, self.enemy)
+        self.battle_map = IMAGES['battleground']
+        self.battle = Battle(self, self.battle_map, IMAGES['interface'], self.battle_number, self.player, self.enemy)
+        self.battle.battle_loop()
