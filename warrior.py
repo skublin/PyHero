@@ -9,6 +9,9 @@ IMAGES = {f'{f}-{n}-{d}': pygame.image.load(f'graphics/warriors/{f}/{n}/{d}.png'
 
 
 class Warrior:
+    """
+    This class makes warriors and calculates damage.
+    """
     def __init__(self, name, health, attack, defence, cost, nickname='Unknown'):
         self.name = name
         self.health = health
@@ -43,6 +46,3 @@ class Warrior:
     def randomness(self):
         # dice roll plus rounded character's Fortune skill value (divided by 5)
         return randint(1, 6) + round(self.owner.skills['Fortune'] / 5)
-
-    def warrior_info(self):
-        pass

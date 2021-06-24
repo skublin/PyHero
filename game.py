@@ -37,6 +37,7 @@ class Game:
     """
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         pygame.display.set_caption("The PyHero")
         self.running, self.playing = True, False
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.ESCAPE_KEY = False, False, False, False, False
@@ -57,7 +58,7 @@ class Game:
         self.turn, self.new_turn = 0, False
         self.battle, self.battle_number, self.battle_mode = None, 0, False
         self.prompt, self.prompt_answer = False, False
-        self.character_prompt, self.army_prompt, self.faq_prompt = False, False, False
+        self.character_prompt, self.army_prompt, self.faq_prompt, self.settings_prompt = False, False, False, False
         self.answer = ''
         self.mx, self.my = 0, 0     # mouse position (mx, my)
         self.move = False
@@ -76,11 +77,15 @@ class Game:
             self.check_events()
             # CHECK IF LEVEL UP
             self.player.check_level_up()
+            # CHECK MAP EVENTS BEFORE MOVE
+            self.world.events_on_map()
             # PLAYER MOVE
             if self.move:
                 road = self.player.move((self.mx, self.my))
                 if self.answer == 'yes' and not self.new_turn:
                     self.show_moves(road, True, False)
+            # CHECK MAP EVENTS AFTER MOVE
+            self.world.events_on_map()
             # BATTLE
             if self.player.position == self.enemy.position:
                 self.show_battle_sign()
@@ -114,6 +119,9 @@ class Game:
             # FAQ PROMPT
             while self.faq_prompt:
                 self.show_faq()
+            # SETTINGS PROMPT
+            while self.settings_prompt:
+                self.world.show_settings()
             # NEXT TURN (ALSO ENEMY MOVE)
             if self.new_turn:
                 road = self.enemy.make_move()
@@ -182,7 +190,7 @@ class Game:
                     elif self.buttons['info'].collidepoint(self.mx, self.my):
                         self.faq_prompt = True
                     elif self.buttons['settings'].collidepoint(self.mx, self.my):
-                        self.prompt = True
+                        self.settings_prompt = True
                     elif self.buttons['turn'].collidepoint(self.mx, self.my):
                         self.prompt = True
                     elif self.buttons['yes'].collidepoint(self.mx, self.my):
@@ -213,6 +221,10 @@ class Game:
                         for target, warrior in zip(self.battle.enemy_clickable_warriors, self.enemy.army):
                             if self.battle.enemy_clickable_warriors[target].collidepoint(self.mx, self.my):
                                 self.battle.click_and_attack(warrior, (self.mx, self.my))
+                    if self.settings_prompt:
+                        for button in self.world.buttons:
+                            if self.world.buttons[button].collidepoint(self.mx, self.my):
+                                self.world.click_button(self.world.buttons[button])
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     self.move = False

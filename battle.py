@@ -15,6 +15,9 @@ BUTTONS = {'next_unit': pygame.image.load('graphics/btn/next_unit.png'),
 
 
 class Battle:
+    """
+    This class makes battle loop and all operations in battle.
+    """
     def __init__(self, game, battle_map, interface_image, number, player, enemy):
         self.game = game
         self.battle_map = battle_map
@@ -28,9 +31,6 @@ class Battle:
         self.buttons = dict()
         self.player_clickable_warriors = dict()
         self.enemy_clickable_warriors = dict()
-
-    def check_armies(self):
-        return len(self.game.player.army) > 0, len(self.game.enemy.army) > 0
 
     def battle_loop(self):
         pygame.mixer.init()

@@ -51,7 +51,7 @@ class Character:
         self.skills = {'Strength': 5, 'Stamina': 5, 'Wisdom': 5, 'Intellect': 5, 'Agility': 5, 'Charm': 5, 'Fortune': 5}
         self.army = dict()
         self.money = 200
-        self.moves = 36
+        self.moves = 8
 
     def find_road(self, start, end):
         """
