@@ -45,7 +45,8 @@ I'll add here new informations about major changes and new versions:
 * eggPy.two **v0.2** (28.05): update of Menu with game and character creation
 * eggPy.three **v0.3** (04.06): small changes in Menu code, many changes in Game class (map as a graph, usage of Dijkstra algorithm, player and enemy movement on the map, basic next turn handling)
 * babyPy.four **v0.4** (15.06): division of Menu class and files, character card prompt working, proper images of warriors on the battleground, character skills, new music
-* babyPy.five **v0.5** (upcoming): code cleaning, army card prompt, settings, battles, skills impact
+* babyPy.five **v0.5** (24.06): army card prompt (with shop), working battles, skills impact (also warriors' attributes and amount), some new graphics
+* babyPy.six **v0.6** (upcoming): code cleaning, faq prompt, settings (both menu and in-game), map events
 
 ---
 
