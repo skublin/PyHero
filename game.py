@@ -14,6 +14,8 @@ FRACTIONS = {0: 'Demon', 1: 'Elf', 2: 'Human', 3: 'Undead'}
 
 IMAGES = {'window_prompt': pygame.image.load('graphics/prompt_window.png'),
           'character_prompt': pygame.image.load('graphics/character_prompt.png'),
+          'army_prompt': pygame.image.load('graphics/army_prompt.png'),
+          'faq_prompt': pygame.image.load('graphics/faq_prompt.png'),
           'char_button': pygame.image.load('graphics/btn/char_button.png'),
           'army_button': pygame.image.load('graphics/btn/army_button.png'),
           'info_button': pygame.image.load('graphics/btn/info_button.png'),
@@ -24,7 +26,9 @@ IMAGES = {'window_prompt': pygame.image.load('graphics/prompt_window.png'),
           'interface': pygame.image.load('graphics/interface.png'),
           'map': pygame.image.load('graphics/map.png'),
           'battleground': pygame.image.load('graphics/battleground_map.png'),
-          'battle_sign': pygame.image.load('graphics/battle_sign.png')}
+          'battle_sign': pygame.image.load('graphics/battle_sign.png'),
+          'coin': pygame.image.load('graphics/coin.png'),
+          'stars': pygame.image.load('graphics/stars.png')}
 
 
 class Game:
@@ -53,7 +57,7 @@ class Game:
         self.turn, self.new_turn = 0, False
         self.battle, self.battle_number, self.battle_mode = None, 0, False
         self.prompt, self.prompt_answer = False, False
-        self.character_prompt, self.army_prompt = False, False
+        self.character_prompt, self.army_prompt, self.faq_prompt = False, False, False
         self.answer = ''
         self.mx, self.my = 0, 0     # mouse position (mx, my)
         self.move = False
@@ -70,6 +74,8 @@ class Game:
             # PREPARATION
             self.draw_interface()
             self.check_events()
+            # CHECK IF LEVEL UP
+            self.player.check_level_up()
             # PLAYER MOVE
             if self.move:
                 road = self.player.move((self.mx, self.my))
@@ -101,7 +107,13 @@ class Game:
                     self.character_prompt = False
             # ARMY CARD PROMPT
             while self.army_prompt:
-                pass
+                self.player.army_info(IMAGES['army_prompt'])
+                if self.ESCAPE_KEY:
+                    self.ESCAPE_KEY = False
+                    self.army_prompt = False
+            # FAQ PROMPT
+            while self.faq_prompt:
+                self.show_faq()
             # NEXT TURN (ALSO ENEMY MOVE)
             if self.new_turn:
                 road = self.enemy.make_move()
@@ -109,6 +121,7 @@ class Game:
                 self.turn += 1
                 self.player.moves += self.add_moves()
                 self.enemy.moves += self.add_moves()
+                self.enemy.turn_reward()
                 self.new_turn = False
             # QUIT GAME
             if self.ESCAPE_KEY:
@@ -167,7 +180,7 @@ class Game:
                     elif self.buttons['army'].collidepoint(self.mx, self.my):
                         self.army_prompt = True
                     elif self.buttons['info'].collidepoint(self.mx, self.my):
-                        self.prompt = True
+                        self.faq_prompt = True
                     elif self.buttons['settings'].collidepoint(self.mx, self.my):
                         self.prompt = True
                     elif self.buttons['turn'].collidepoint(self.mx, self.my):
@@ -185,6 +198,21 @@ class Game:
                         for button in self.player.skill_buttons:
                             if self.player.skill_buttons[button].collidepoint(self.mx, self.my):
                                 self.player.skill_change(button)
+                    # implementation of add/remove player's warriors (just buttons as above in character info)
+                    if self.army_prompt:
+                        for button in self.player.army_shop_buttons:
+                            if self.player.army_shop_buttons[button].collidepoint(self.mx, self.my):
+                                self.player.shop_warrior(button)
+                    if self.player.open_info:
+                        self.player.open_info = False
+                    if self.battle_mode:
+                        # moving pointer
+                        if self.battle.buttons['next_unit'].collidepoint(self.mx, self.my):
+                            self.battle.next_unit_click()
+                        # clicking on warriors - player's attack
+                        for target, warrior in zip(self.battle.enemy_clickable_warriors, self.enemy.army):
+                            if self.battle.enemy_clickable_warriors[target].collidepoint(self.mx, self.my):
+                                self.battle.click_and_attack(warrior, (self.mx, self.my))
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     self.move = False
@@ -196,8 +224,11 @@ class Game:
         self.map = self.display.blit(IMAGES['map'], (12, 126))
         self.display.blit(IMAGES['interface'], (0, 0))
         self.draw_text(f'{self.player.name}', 40, 26, 14, text_format='tl')
-        self.draw_text(f'| level: {self.player.level} ({self.player.experience}/100) |'
-                       f' money: {self.player.money} |', 26, 28, 64, text_format='tl')
+        self.display.blit(IMAGES['stars'], (22, 70))
+        self.display.blit(IMAGES['coin'], (222, 74))
+        self.draw_text(f'{self.player.level} [{self.player.experience}/{self.player.to_level_up}]',
+                       28, 78, 66, text_format='tl')
+        self.draw_text(f'{self.player.money}', 28, 256, 66, text_format='tl')
         self.draw_text(f'Turn: {self.turn}', 36, 768, 16, text_format='tl')
         self.draw_text(f'Moves: {self.player.moves}', 36, 768, 54, text_format='tl')
         self.buttons['char'] = self.display.blit(IMAGES['char_button'], (394, 20))
@@ -230,25 +261,35 @@ class Game:
         pygame.display.update()
         pygame.time.delay(self.world.game_speed * 2)
 
-    def make_characters(self):
-        self.player.flag = pygame.image.load(f"graphics/flags/{self.MENUS['creator_menu'].flag_number}_small.png")
-        self.player.name = self.MENUS['creator_menu'].input_name
-        self.player.fraction = self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number]
-        flags_left = [i for i in range(8)]
-        flags_left.remove(self.MENUS['creator_menu'].flag_number)
-        fractions_left = ['Demon', 'Elf', 'Human', 'Undead']
-        fractions_left.remove(self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number])
-        self.enemy.flag = pygame.image.load(f"graphics/flags/{choice(flags_left)}_small.png")
-        self.enemy.fraction = choice(fractions_left)
+    def make_characters(self, kind='both'):
+        if kind == 'both' or 'player':
+            self.player.flag = pygame.image.load(f"graphics/flags/{self.MENUS['creator_menu'].flag_number}_small.png")
+            self.player.name = self.MENUS['creator_menu'].input_name
+            self.player.fraction = self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number]
+            self.player.make_army()
+        if kind == 'both' or 'enemy':
+            flags_left = [i for i in range(8)]
+            flags_left.remove(self.MENUS['creator_menu'].flag_number)
+            fractions_left = ['Demon', 'Elf', 'Human', 'Undead']
+            fractions_left.remove(self.MENUS['creator_menu'].fractions[self.MENUS['creator_menu'].fraction_number])
+            self.enemy.flag = pygame.image.load(f"graphics/flags/{choice(flags_left)}_small.png")
+            self.enemy.fraction = choice(fractions_left)
+            self.enemy.make_army()
 
-    def draw_text(self, text, size, x, y, text_format=None):
+    def draw_text(self, text, size, x, y, text_format=None, text_color='black'):
         font = pygame.font.Font(self.font_name, size)
         text_surface = font.render(text, True, (0, 0, 0))
+        if text_color == 'white':
+            text_surface = font.render(text, True, (255, 255, 255))
+        elif text_color == 'red':
+            text_surface = font.render(text, True, (255, 0, 0))
         text_rect = text_surface.get_rect()
         if text_format == 'center' or text_format == 'c':
             text_rect.center = (x, y)
         elif text_format == 'top-left' or text_format == 'tl':
             text_rect.topleft = (x, y)
+        elif text_format == 'bottom-left' or text_format == 'bl':
+            text_rect.bottomleft = (x, y)
         self.display.blit(text_surface, text_rect)
 
     def open_prompt(self, text, additional_text=''):
@@ -296,3 +337,13 @@ class Game:
         self.battle_map = IMAGES['battleground']
         self.battle = Battle(self, self.battle_map, IMAGES['interface'], self.battle_number, self.player, self.enemy)
         self.battle.battle_loop()
+
+    def show_faq(self):
+        self.check_events()
+        if self.ESCAPE_KEY:
+            self.ESCAPE_KEY = False
+            self.faq_prompt = False
+        self.draw_interface()
+        self.display.blit(IMAGES['faq_prompt'], (204, 256))
+        self.window.blit(self.display, (0, 0))
+        pygame.display.update()

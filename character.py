@@ -1,33 +1,42 @@
 from warrior import *
-from random import randint
+from random import randint, choice
 import pygame
 
 
 # list of possible warriors in every fraction Warrior(name, health, attack, defence, cost)
 # it's a dictionary '[fraction name]': list(Warriors from class Warrior)
-WARRIORS = {'Demon': [Warrior('demon-1', 30, 10, 8, 5), Warrior('demon-2', 30, 10, 8, 5),
-                      Warrior('demon-3', 30, 10, 8, 5), Warrior('demon-4', 30, 10, 8, 5),
-                      Warrior('demon-5', 30, 10, 8, 5), Warrior('demon-6', 30, 10, 8, 5),
-                      Warrior('demon-7', 30, 10, 8, 5)],
-            'Elf': [Warrior('elf-1', 30, 10, 8, 5), Warrior('elf-2', 30, 10, 8, 5),
-                    Warrior('elf-3', 30, 10, 8, 5), Warrior('elf-4', 30, 10, 8, 5),
-                    Warrior('elf-5', 30, 10, 8, 5), Warrior('elf-6', 30, 10, 8, 5),
-                    Warrior('elf-7', 30, 10, 8, 5)],
-            'Human': [Warrior('human-1', 30, 10, 8, 5), Warrior('human-2', 30, 10, 8, 5),
-                      Warrior('human-3', 30, 10, 8, 5), Warrior('human-4', 30, 10, 8, 5),
-                      Warrior('human-5', 30, 10, 8, 5), Warrior('human-6', 30, 10, 8, 5),
-                      Warrior('human-7', 30, 10, 8, 5)],
-            'Undead': [Warrior('undead-1', 30, 10, 8, 5), Warrior('undead-2', 30, 10, 8, 5),
-                       Warrior('undead-3', 30, 10, 8, 5), Warrior('undead-4', 30, 10, 8, 5),
-                       Warrior('undead-5', 30, 10, 8, 5), Warrior('undead-6', 30, 10, 8, 5),
-                       Warrior('undead-7', 30, 10, 8, 5)]}
+WARRIORS = {'Demon': [Warrior('demon-1', 20, 8, 8, 5, 'Devil'), Warrior('demon-2', 20, 14, 6, 10, 'Warlock'),
+                      Warrior('demon-3', 25, 16, 12, 20, 'Flamer'), Warrior('demon-4', 30, 20, 12, 30, 'Nija'),
+                      Warrior('demon-5', 50, 24, 12, 40, 'Mammon'), Warrior('demon-6', 50, 30, 20, 60, 'Tchort'),
+                      Warrior('demon-7', 60, 32, 24, 80, 'Fenriz')],
+            'Elf': [Warrior('elf-1', 20, 8, 8, 5, 'Aegnor'), Warrior('elf-2', 20, 14, 6, 10, 'Agada'),
+                    Warrior('elf-3', 25, 16, 12, 20, 'Aveley'), Warrior('elf-4', 30, 20, 12, 30, 'Alfur'),
+                    Warrior('elf-5', 50, 24, 12, 40, 'Alvgjerd'), Warrior('elf-6', 50, 30, 20, 60, 'Fangorn'),
+                    Warrior('elf-7', 60, 32, 24, 80, 'Unicorn')],
+            'Human': [Warrior('human-1', 20, 8, 8, 5, 'Merek'), Warrior('human-2', 20, 14, 6, 10, 'Rowan'),
+                      Warrior('human-3', 25, 16, 12, 20, 'Fendrel'), Warrior('human-4', 30, 20, 12, 30, 'Emeline'),
+                      Warrior('human-5', 50, 24, 12, 40, 'Althalos'), Warrior('human-6', 50, 30, 20, 60, 'Cassius'),
+                      Warrior('human-7', 60, 32, 24, 80, 'Berinon')],
+            'Undead': [Warrior('undead-1', 20, 8, 8, 5, 'Regis'), Warrior('undead-2', 20, 14, 6, 10, 'Jendrich'),
+                       Warrior('undead-3', 25, 16, 12, 20, 'Dracula'), Warrior('undead-4', 30, 20, 12, 30, 'Mummy'),
+                       Warrior('undead-5', 50, 24, 12, 40, 'Reaper'), Warrior('undead-6', 50, 30, 20, 60, 'Shana'),
+                       Warrior('undead-7', 60, 32, 24, 80, 'Egidius')]}
 
 
-IMAGES = {'button_plus': pygame.image.load('graphics/btn/button_plus.png'),
-          'button_minus': pygame.image.load('graphics/btn/button_minus.png')}
+IMAGES = {'warrior_info': pygame.image.load('graphics/btn/warrior_info.png'),
+          'button_plus': pygame.image.load('graphics/btn/button_plus.png'),
+          'button_minus': pygame.image.load('graphics/btn/button_minus.png'),
+          'coin': pygame.image.load('graphics/coin.png'),
+          'warrior_table': pygame.image.load('graphics/warrior_table.png'),
+          'warrior_health': pygame.image.load('graphics/warrior_health.png'),
+          'warrior_attack': pygame.image.load('graphics/warrior_attack.png'),
+          'warrior_defence': pygame.image.load('graphics/warrior_defence.png')}
 
 
 class Character:
+    """
+    This class creates basic hero, with attributes and methods for both Player and Enemy.
+    """
     def __init__(self, game, name, color, fraction, position):
         self.game = game
         self.name = name
@@ -36,32 +45,13 @@ class Character:
         self.position = position
         self.flag = pygame.image.load(f'graphics/flags/{self.color}_small.png')
         self.level = 1
-        self.experience = 0
+        self.experience = 20
+        self.to_level_up = 100
         self.skill_points = 10
         self.skills = {'Strength': 5, 'Stamina': 5, 'Wisdom': 5, 'Intellect': 5, 'Agility': 5, 'Charm': 5, 'Fortune': 5}
-        self.army = {warrior: 0 for warrior in WARRIORS[self.fraction]}
-        self.money = 100
-        self.moves = 6
-
-    def add_warrior(self, number, amount):
-        """
-        This method lets characters buy new warriors to army (if enough money).
-        """
-        if self.money >= WARRIORS[f'{self.fraction}'][number - 1].cost * amount:
-            self.army[f'{self.fraction.lower()}-{number}'] += amount
-            self.money -= WARRIORS[f'{self.fraction}'][number - 1].cost * amount
-        else:
-            return False
-
-    def remove_warrior(self, number, amount):
-        """
-        This method lets characters sell warriors from army and have 50% money back.
-        """
-        if self.army[f'{self.fraction.lower()}-{number}'] >= amount:
-            self.army[f'{self.fraction.lower()}-{number}'] -= amount
-            self.money += (WARRIORS[f'{self.fraction}'][number - 1].cost * amount) / 2
-        else:
-            return False
+        self.army = dict()
+        self.money = 200
+        self.moves = 36
 
     def find_road(self, start, end):
         """
@@ -82,6 +72,47 @@ class Character:
         j = (x - off_j) // 64
         return i, j
 
+    def make_army(self):
+        self.army = {warrior: 1 for warrior in WARRIORS[self.fraction]}
+        for warrior, i in zip(self.army, range(1, 8)):
+            warrior.owner = self
+            if i == 1:
+                self.army[warrior] = 20
+            elif i == 2:
+                self.army[warrior] = 16
+            elif i == 3:
+                self.army[warrior] = 12
+            elif i == 4:
+                self.army[warrior] = 8
+            elif i == 5:
+                self.army[warrior] = 4
+            elif i == 6:
+                self.army[warrior] = 2
+            elif i == 7:
+                self.army[warrior] = 1
+
+    def warriors_alive(self, index):
+        """
+        Check warrior with index number if is alive (more than 0 warriors)
+        """
+        for warrior, i in zip(self.army, range(1, 8)):
+            if i == index:
+                if self.army[warrior] > 0:
+                    return True
+                else:
+                    return False
+
+    @staticmethod
+    def alive_in_army(character):
+        return [warrior for warrior in character.army if character.army[warrior] > 0]
+
+    def check_level_up(self):
+        if self.experience >= self.to_level_up:
+            self.experience -= self.to_level_up
+            self.level += 1
+            self.skill_points += 10
+            self.money += 100
+
 
 class Player(Character):
     """
@@ -90,6 +121,8 @@ class Player(Character):
     def __init__(self, game, name, color, fraction, position):
         super().__init__(game, name, color, fraction, position)
         self.skill_buttons = dict()
+        self.army_shop_buttons = dict()
+        self.open_info = False
 
     def move(self, destination):
         x, y = destination
@@ -129,10 +162,7 @@ class Player(Character):
     def character_info(self, image):
         while self.game.character_prompt:
             self.game.check_events()
-            # PROBABLY IT'S FINE TO REMOVE if AND elif STATEMENTS
             if self.game.ESCAPE_KEY:
-                self.game.character_prompt = False
-            elif self.game.START_KEY:
                 self.game.character_prompt = False
             self.game.draw_interface()
             self.game.display.blit(image, (204, 256))
@@ -140,7 +170,7 @@ class Player(Character):
             # LEFT SIDE OF PROMPT WINDOW
             self.game.draw_text('Character:', 36, 380, 302, text_format='c')
             self.game.draw_text(f'{self.name}', 34, 380, 350, text_format='c')
-            self.game.draw_text(f'Fraction: {self.fraction}', 32, 380, 390, text_format='c')
+            self.game.draw_text(f'{self.fraction}', 32, 380, 390, text_format='c')
             self.game.draw_text(f'Level: {self.level}', 32, 380, 430, text_format='c')
             self.game.draw_text(f'XP: {self.experience} / 100', 32, 380, 470, text_format='c')
             self.game.draw_text(f'Money: {self.money}', 32, 380, 510, text_format='c')
@@ -168,6 +198,71 @@ class Player(Character):
             self.skills[skill] -= 1
             self.skill_points += 1
 
+    def army_info(self, image):
+        while self.game.army_prompt:
+            self.game.check_events()
+            if self.game.ESCAPE_KEY:
+                self.game.army_prompt = False
+            self.game.draw_interface()
+            self.game.display.blit(image, (204, 256))
+            # DRAW ARMY INFO, COST AND BUTTONS
+            for warrior, i in zip(self.army, range(1, 8)):
+                field = warrior.image_right.get_rect()
+                offset = (i - 1) * 133 if i < 4 else (i - 5) * 133
+                next_row = 0 if i < 4 else 164
+                field.bottomleft = (403 + offset, 426 + next_row)
+                self.game.draw_text(f'{self.army[warrior]}', 32, 459.5 + offset, 456 + next_row - next_row * 0.061, 'c')
+                self.game.draw_text(f'{warrior.cost}', 32, 483 + offset, 426 + next_row, 'bl')
+                self.game.display.blit(IMAGES['coin'], (483 + offset, 369 + next_row))
+                self.army_shop_buttons[f'{warrior.name}_minus'] = self.game.display.blit(
+                    IMAGES['button_minus'], (403 + offset, 438 + next_row - next_row * 0.061))
+                self.army_shop_buttons[f'{warrior.name}_plus'] = self.game.display.blit(
+                    IMAGES['button_plus'], (478 + offset, 438 + next_row - next_row * 0.061))
+                self.army_shop_buttons[f'{warrior.name}_info'] = self.game.display.blit(
+                    IMAGES['warrior_info'], (482 + offset, 322 + next_row))
+                self.game.display.blit(warrior.image_right, field)
+            # BLIT AND UPDATE
+            self.game.window.blit(self.game.display, (0, 0))
+            pygame.display.update()
+
+    def shop_warrior(self, button_clicked):
+        """
+        This method lets characters buy new warriors to army (if enough money).
+        """
+        positions = [(392, 310), (525, 310), (658, 310), (259, 474), (392, 474), (525, 474), (658, 474)]
+        warrior_name, postfix = button_clicked.split('_')
+        warrior_fraction, warrior_number = warrior_name.split('-')
+        warrior = WARRIORS[warrior_fraction[0].upper() + warrior_fraction[1:]][int(warrior_number) - 1]
+        warrior_cost = warrior.cost
+        field = IMAGES['warrior_table'].get_rect()
+        field.topleft = positions[int(warrior_number) - 1]
+        xp, yp = (positions[int(warrior_number) - 1][0] + 34, positions[int(warrior_number) - 1][1] + 46)
+        if postfix == 'plus' and self.money >= warrior_cost:
+            self.army[warrior] += 1
+            self.money -= warrior_cost
+        elif postfix == 'minus' and self.army[warrior] > 0:
+            self.army[warrior] -= 1
+            self.money += warrior_cost
+        elif postfix == 'info':
+            self.open_info = True
+            while self.open_info:
+                self.game.check_events()
+                # TABLE AND WARRIOR NICKNAME
+                self.game.display.blit(IMAGES['warrior_table'], field)
+                self.game.draw_text(f'{warrior.nickname}', 22, xp + 32, yp - 16, 'c')
+                # WARRIOR HEALTH
+                self.game.display.blit(IMAGES['warrior_health'], (xp, yp))
+                self.game.draw_text(f'{warrior.health}', 24, xp + 36, yp, 'tl')
+                # WARRIOR ATTACK
+                self.game.display.blit(IMAGES['warrior_attack'], (xp, yp + 36))
+                self.game.draw_text(f'{warrior.attack}', 24, xp + 36, yp + 36, 'tl')
+                # WARRIOR DEFENCE
+                self.game.display.blit(IMAGES['warrior_defence'], (xp, yp + 72))
+                self.game.draw_text(f'{warrior.defence}', 24, xp + 36, yp + 72, 'tl')
+                # BLIT AND UPDATE
+                self.game.window.blit(self.game.display, (0, 0))
+                pygame.display.update()
+
 
 class Enemy(Character):
     """
@@ -191,3 +286,18 @@ class Enemy(Character):
     # not implemented yet
     def difficulty_change(self):
         return self.difficulty
+
+    @staticmethod
+    def draw_warrior_to_attack(character):
+        return choice(character.alive_in_army(character))
+
+    def turn_reward(self):
+        self.experience += 50
+        self.money += 50
+        for warrior, i in zip(self.army, range(1, 8)):
+            if 0 < i < 4:
+                self.army[warrior] += 4
+            elif 3 < i < 7:
+                self.army[warrior] += 2
+            elif i == 7:
+                self.army[warrior] += 1

@@ -3,7 +3,7 @@ import pygame
 
 class Menu:
     """
-    This class handle the operations in menu and how it works.
+    This class creates basic menu for subclasses.
     """
     def __init__(self, game):
         self.game = game
