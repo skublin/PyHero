@@ -33,6 +33,7 @@ class Battle:
         return len(self.game.player.army) > 0, len(self.game.enemy.army) > 0
 
     def battle_loop(self):
+        pygame.mixer.init()
         pygame.mixer.music.load("music/battle_music.ogg")
         pygame.mixer.music.play(-1)
         self.player_pointer, self.enemy_pointer = 1, 0
@@ -182,7 +183,6 @@ class Battle:
                         defender.actual_health -= damage
                     self.draw_battle_interface()
                     self.game.draw_text(f'-{damage}', 36, x + 20, y - 20, text_format='c', text_color='red')
-                    print(f'{defender.name=}, {defender.health=}, {defender.actual_health=}')
                     self.game.window.blit(self.game.display, (0, 0))
                     pygame.display.update()
                     pygame.time.delay(self.game.world.game_speed * 2)
@@ -206,7 +206,6 @@ class Battle:
                         defender.actual_health -= damage
                     self.draw_battle_interface()
                     self.game.draw_text(f'-{damage}', 36, x + 34, y + 48, text_format='c', text_color='red')
-                    print(f'{defender.name=}, {defender.health=}, {defender.actual_health=}')
                     self.game.window.blit(self.game.display, (0, 0))
                     pygame.display.update()
                     pygame.time.delay(self.game.world.game_speed * 4)
