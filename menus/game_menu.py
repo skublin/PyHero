@@ -6,7 +6,7 @@ class GameMenu(Menu):
     A subclass of Menu to handle start of new game, load game and character creation.
     """
     def __init__(self, game):
-        Menu.__init__(self, game)
+        super().__init__(game)
         self.state = 'New Game'
         self.cursor_rect.midtop = (self.mid_width + self.offset, self.mid_height + 64)
 

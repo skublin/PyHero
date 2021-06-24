@@ -6,14 +6,14 @@ class CreditsMenu(Menu):
     A subclass of Menu just to show some credits.
     """
     def __init__(self, game):
-        Menu.__init__(self, game)
+        super().__init__(game)
 
     def display_menu(self):
         self.run_display = True
         while self.run_display:
             self.game.check_events()
             # BACK_KEY may be removed
-            if self.game.START_KEY or self.game.BACK_KEY or self.game.ESCAPE_KEY:
+            if self.game.START_KEY or self.game.ESCAPE_KEY:
                 self.game.curr_menu = self.game.MENUS['main_menu']
                 self.run_display = False
             self.game.display.blit(self.bg, (0, 0))

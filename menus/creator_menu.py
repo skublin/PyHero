@@ -9,7 +9,7 @@ class CreatorMenu(Menu):
     It allows user to pick a name, flag color and fraction.
     """
     def __init__(self, game):
-        Menu.__init__(self, game)
+        super().__init__(game)
         self.state = 'Name'
         self.input_name = ''
         self.flag_number = 0
