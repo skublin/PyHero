@@ -21,7 +21,7 @@ class CreditsMenu(Menu):
             self.game.draw_text('Author:', 44, self.mid_width, self.mid_height + 64, text_format='c')
             self.game.draw_text('Szymon Kublin', 44, self.mid_width, self.mid_height + 112, text_format='c')
             self.game.draw_text('Music:', 44, self.mid_width, self.mid_height + 170, text_format='c')
-            self.game.draw_text('Pictures of the Floating World', 44,
+            self.game.draw_text('Free Music Archive', 44,
                                 self.mid_width, self.mid_height + 218, text_format='c')
             self.game.draw_text('Graphic:', 44, self.mid_width, self.mid_height + 276, text_format='c')
             self.game.draw_text('CraftPix Assets', 44, self.mid_width, self.mid_height + 324, text_format='c')
