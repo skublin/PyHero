@@ -47,7 +47,7 @@ I'll add here new informations about major changes and new versions:
 * babyPy.four **v0.4** (15.06): division of Menu class and files, character card prompt working, proper images of warriors on the battleground, character skills, new music
 * babyPy.five **v0.5** (24.06): army card prompt (with shop), working battles, skills impact (also warriors' attributes and amount), some new graphics
 * babyPy.six **v0.6** (25.06): faq prompt, settings in-game (game speed and music volume), better balance, map events
-* babyPy.seven **v0.7** (upcoming): new features
+* juvenilePy.seven **v0.7** (upcoming): new features
 
 ---
 
