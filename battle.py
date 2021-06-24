@@ -48,6 +48,13 @@ class Battle:
                 if self.game.prompt_answer:
                     if self.game.answer == 'yes':
                         self.game.prompt = False
+                        self.player.experience -= 20
+                        self.player.money -= 20
+                        if self.player.experience < 0:
+                            self.player.experience = 0
+                        if self.player.money < 0:
+                            self.player.money = 0
+                        self.player.position = choice(self.game.POSITIONS[12])
                         self.quit_battle()
             # ENEMY ATTACK
             if 0 < self.enemy_pointer < 7:
